@@ -37,7 +37,7 @@ export default function AdoptionScreen({ petId }) {
     [shelter]
   );
 
-  // ✅ Fetch pet + shelter + similar pets
+  // Fetch pet + shelter + similar pets
   useEffect(() => {
     const fetchPetAndShelter = async () => {
       try {
@@ -48,7 +48,7 @@ export default function AdoptionScreen({ petId }) {
           const petData = { id: docSnap.id, ...docSnap.data() };
           setPet(petData);
 
-          // ✅ Find shelter by matching name
+          // Find shelter by matching name
           const sheltersSnapshot = await getDocs(collection(db, "Shelters"));
           const matchedShelter = sheltersSnapshot.docs.find(
             (s) => s.data().name === petData.shelter
@@ -61,7 +61,7 @@ export default function AdoptionScreen({ petId }) {
             });
           }
 
-          // ✅ Fetch similar pets
+          // Fetch similar pets
           const q = query(
             collection(db, "Animals"),
             where("species", "==", petData.species),
@@ -84,7 +84,7 @@ export default function AdoptionScreen({ petId }) {
     fetchPetAndShelter();
   }, [petId]);
 
-  // ✅ Age Calculator
+  // Age Calculator
   const calculateAge = (birthDate) => {
     if (!birthDate?.toDate) return "Unknown";
     const b = birthDate.toDate();
@@ -110,7 +110,7 @@ export default function AdoptionScreen({ petId }) {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {/* ✅ BACK BUTTON */}
+        {/* BACK BUTTON */}
         <TouchableOpacity
           onPress={() => router.back()}
           style={{ flexDirection: "row", alignItems: "center", marginTop: 10 }}
@@ -118,7 +118,7 @@ export default function AdoptionScreen({ petId }) {
           <Text style={{ fontSize: 16, color: "#1E3A8A" }}>← Back</Text>
         </TouchableOpacity>
 
-        {/* 🐾 PET IMAGE */}
+        {/* PET IMAGE */}
         <Image source={{ uri: pet.imageUrl }} style={styles.image} />
 
         <View style={styles.headerInfo}>
@@ -137,7 +137,7 @@ export default function AdoptionScreen({ petId }) {
           </View>
         </View>
 
-        {/* ✅ INFO GRID */}
+        {/* INFO GRID */}
         <View style={styles.infoGrid}>
           <View style={styles.infoBox}>
             <Text style={styles.infoLabel}>Age</Text>
@@ -164,11 +164,11 @@ export default function AdoptionScreen({ petId }) {
           )}
         </View>
 
-        {/* ✅ ABOUT */}
+        {/* ABOUT */}
         <Text style={styles.sectionTitle}>About {pet.name}</Text>
         <Text style={styles.story}>{pet.story}</Text>
 
-        {/* ✅ HEALTH */}
+        {/* HEALTH */}
         <Text style={styles.sectionTitle}>Health & Care</Text>
         <View style={styles.badgeContainer}>
           {pet.health?.split(",").map((h, idx) => (
@@ -177,7 +177,7 @@ export default function AdoptionScreen({ petId }) {
             </Text>
           ))}
 
-          {/* ✅ Neutered/Spayed */}
+          {/* Neutered/Spayed */}
           {pet.isSpayedOrNeutered !== undefined && (
             <Text
               style={[
@@ -199,7 +199,7 @@ export default function AdoptionScreen({ petId }) {
           )}
         </View>
 
-        {/* ✅ SHELTER INFO */}
+        {/* SHELTER INFO */}
         <Text style={styles.sectionTitle}>Shelter Information</Text>
         <View style={styles.shelterBox}>
           <Text style={styles.shelterName}>{shelter?.name}</Text>
@@ -213,7 +213,7 @@ export default function AdoptionScreen({ petId }) {
           </TouchableOpacity>
         </View>
 
-        {/* ✅ CONTACT MODAL */}
+        {/* CONTACT MODAL */}
         <Modal
           animationType="slide"
           transparent={true}
@@ -316,7 +316,7 @@ export default function AdoptionScreen({ petId }) {
           </View>
         </Modal>
 
-        {/* ✅ SIMILAR PETS */}
+        {/* SIMILAR PETS */}
         {similarPets.length > 0 && (
           <>
             <Text style={styles.sectionTitle}>Similar Pets</Text>
@@ -345,7 +345,7 @@ export default function AdoptionScreen({ petId }) {
           </>
         )}
 
-        {/* ✅ ADOPTION BUTTON */}
+        {/* ADOPTION BUTTON */}
         {pet.status === "Available" ? (
           <TouchableOpacity
             style={styles.adoptButton}
@@ -366,9 +366,9 @@ export default function AdoptionScreen({ petId }) {
   );
 }
 
-//
-// ✅ STYLES
-//
+
+// STYLES
+
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", paddingHorizontal: 16 },
   image: {

@@ -27,7 +27,7 @@ export default function SignIn() {
   const emailRef = useRef("");
   const passwordRef = useRef("");
 
-  // 🔹 Forgot Password
+  // Forgot Password
   const handleForgotPassword = async () => {
     if (!emailRef.current) {
       Alert.alert("Forgot Password", "Please enter your email first.");
@@ -41,7 +41,7 @@ export default function SignIn() {
     }
   };
 
-  // 🔹 Login Handler
+  // Login Handler
   const handleLogin = async () => {
     if (!emailRef.current || !passwordRef.current) {
       Alert.alert("Sign In", "Please fill all the fields!");
@@ -68,7 +68,7 @@ export default function SignIn() {
         style={{ paddingTop: hp(3), paddingHorizontal: wp(5) }}
         className="flex-1 gap-10"
       >
-        {/* 🐾 App Image */}
+        {/* App Image */}
         <View className="items-center">
           <Image
             style={{ height: hp(35) }}

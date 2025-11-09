@@ -8,10 +8,10 @@ import { Alert, Platform } from "react-native";
 import { db } from "../config/firebaseConfig";
 import { useAuth } from "../context/authContext";
 
-// 🔧 Configure notification behavior when app is foregrounded
+// Configure notification behavior when app is foregrounded
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowAlert: true, // ✅ show alert in foreground
+    shouldShowAlert: true, // show alert in foreground
     shouldPlaySound: true,
     shouldSetBadge: false,
   }),
@@ -23,7 +23,7 @@ Notifications.setNotificationHandler({
  */
 export async function registerForPushAsync() {
   try {
-    // ⚠️ Skip push registration in Expo Go
+    // Skip push registration in Expo Go
     if (Constants.appOwnership === "expo") {
       console.log("⚠️ Skipping push token registration — not supported in Expo Go.");
       return null;
@@ -49,7 +49,7 @@ export async function registerForPushAsync() {
       return null;
     }
 
-    // ✅ Get Expo push token
+    // Get Expo push token
     const tokenResponse = await Notifications.getExpoPushTokenAsync({
       projectId: Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId,
     });
@@ -57,7 +57,7 @@ export async function registerForPushAsync() {
     const token = tokenResponse.data;
     console.log("📱 Expo push token:", token);
 
-    // ⚙️ Configure Android channel
+    // Configure Android channel
     if (Platform.OS === "android") {
       await Notifications.setNotificationChannelAsync("default", {
         name: "Default",
@@ -90,7 +90,7 @@ export function useRegisterVolunteerToken() {
       try {
         const token = await registerForPushAsync();
 
-        // 💾 Save token if exists
+        // Save token if exists
         if (token) {
           const ref = doc(db, "users", user.userId);
           await updateDoc(ref, { fcmToken: token });
@@ -102,11 +102,10 @@ export function useRegisterVolunteerToken() {
         console.error("⚠️ Error saving push token:", error);
       }
 
-      // 👂 Listen for notifications (foreground)
+      // Listen for notifications (foreground)
       subscription = Notifications.addNotificationReceivedListener((notification) => {
         console.log("🔔 Notification received:", notification);
 
-        // Optional: show an in-app alert
         try {
           const title = notification.request.content.title || "Notification";
           const body = notification.request.content.body || "New message received.";
@@ -117,7 +116,7 @@ export function useRegisterVolunteerToken() {
       });
     })();
 
-    // 🧹 Cleanup listener on unmount
+    // Cleanup listener on unmount
     return () => {
       if (subscription) subscription.remove();
     };

@@ -24,13 +24,13 @@ export default function PetListScreen() {
   const filters = ["All", "Dogs", "Cats"];
   const sorts = ["admissionDate", "age"];
 
-  // ✅ Real-time Firestore listener
+  // Real-time Firestore listener
   useEffect(() => {
     const q = query(collection(db, "Animals"), orderBy("admissionDate", "desc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       let data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 
-      // 🔹 Local sorting logic
+      // Local sorting logic
       if (sortBy === "age") {
         data.sort((a, b) => {
           const aDate = a.birthDate?.toDate ? a.birthDate.toDate() : new Date();
@@ -64,7 +64,7 @@ export default function PetListScreen() {
     );
   }
 
-  // ✅ Apply filters + search
+  // Apply filters + search
   const filteredPets = pets.filter((pet) => {
     const species = pet.species?.toLowerCase();
     const matchesSearch = pet.name
@@ -83,7 +83,7 @@ export default function PetListScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Adopt a Pet</Text>
 
-      {/* ✅ Search */}
+      {/* Search */}
       <TextInput
         style={styles.searchBar}
         placeholder="Search by name..."
@@ -91,10 +91,10 @@ export default function PetListScreen() {
         onChangeText={setSearchText}
       />
 
-      {/* ✅ SORT + FILTER BLOCK */}
+      {/* SORT + FILTER BLOCK */}
       <View style={styles.sortFilterWrapper}>
         
-        {/* ✅ Sort Buttons */}
+        {/* Sort Buttons */}
         <View style={styles.sortContainer}>
           {sorts.map((s) => (
             <TouchableOpacity
@@ -117,7 +117,7 @@ export default function PetListScreen() {
           ))}
         </View>
 
-        {/* ✅ Filter Buttons */}
+        {/* Filter Buttons */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -145,7 +145,7 @@ export default function PetListScreen() {
         </ScrollView>
       </View>
 
-      {/* ✅ Pet Cards */}
+      {/* Pet Cards */}
       <FlatList
         data={filteredPets}
         keyExtractor={(item) => item.id}
@@ -161,7 +161,7 @@ export default function PetListScreen() {
             <View style={styles.cardContent}>
               <Text style={styles.petName}>{item.name}</Text>
 
-              {/* ✅ Updated badge */}
+              {/* Updated badge */}
               <Text
                 style={[
                   styles.badge,
@@ -185,7 +185,7 @@ export default function PetListScreen() {
                   styles.button,
                   item.status !== "Available" && { opacity: 0.5 },
                 ]}
-                disabled={item.status !== "Available"} // ✅ prevent adopting unavailable pets
+                disabled={item.status !== "Available"} // prevent adopting unavailable pets
                 onPress={() =>
                   router.push({
                     pathname: "/adopt/[id]",

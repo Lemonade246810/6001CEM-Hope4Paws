@@ -37,7 +37,7 @@ export default function ManageReports() {
     []
   );
 
-  // ✅ Load pending reports LIVE (status == Pending)
+  // Load pending reports LIVE (status == Pending)
   useEffect(() => {
     const q = query(
       refs.reportsCol,
@@ -53,7 +53,7 @@ export default function ManageReports() {
     return unsub;
   }, [refs]);
 
-  // ✅ Load volunteers
+  // Load volunteers
   useEffect(() => {
     (async () => {
       const q = query(refs.usersCol, where("role", "==", "volunteer"));
@@ -63,7 +63,7 @@ export default function ManageReports() {
     })();
   }, [refs]);
 
-  // ✅ Assign volunteer to report
+  // Assign volunteer to report
   const handleAssign = async (report) => {
     const volunteerId = selection[report.id];
     if (!volunteerId) {

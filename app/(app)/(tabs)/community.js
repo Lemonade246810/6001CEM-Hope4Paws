@@ -26,9 +26,7 @@ export default function CommunityPage() {
   const [posts, setPosts] = useState([]);
   const user = auth.currentUser;
 
-  // =====================================================
   // FETCH POSTS LIVE
-  // =====================================================
   useEffect(() => {
     const q = query(
       collection(db, "CommunityPosts"),
@@ -46,9 +44,7 @@ export default function CommunityPage() {
     return unsubscribe;
   }, []);
 
-  // =====================================================
   // DELETE STORY
-  // =====================================================
   const deleteStory = (postId) => {
     Alert.alert(
       "Delete Story",
@@ -72,9 +68,7 @@ export default function CommunityPage() {
     );
   };
 
-  // =====================================================
   // LIKE / UNLIKE
-  // =====================================================
   const toggleLike = async (postId, currentLikes) => {
     const userId = user?.uid;
     if (!userId) return;
@@ -87,9 +81,7 @@ export default function CommunityPage() {
     await updateDoc(postRef, { likes: updatedLikes });
   };
 
-  // =====================================================
   // RENDER UI
-  // =====================================================
 
   return (
     <ScrollView style={styles.container}>

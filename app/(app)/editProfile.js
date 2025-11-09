@@ -1,25 +1,25 @@
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import {
-    updateEmail,
-    updatePassword
+  updateEmail,
+  updatePassword
 } from "firebase/auth";
 import {
-    doc,
-    updateDoc,
+  doc,
+  updateDoc,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { auth, db, storage } from "../../config/firebaseConfig";
 import { useAuth } from "../../context/authContext";
@@ -35,7 +35,7 @@ export default function EditProfile() {
   const [profileImage, setProfileImage] = useState(user?.profileImage || "");
   const [uploading, setUploading] = useState(false);
 
-  // ✅ Pick Image
+  // Pick Image
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
@@ -47,7 +47,7 @@ export default function EditProfile() {
     }
   };
 
-  // ✅ Upload Image to Firebase Storage
+  // Upload Image to Firebase Storage
   const uploadProfileImage = async () => {
     if (!profileImage || profileImage === user?.profileImage) return user?.profileImage;
 
@@ -61,7 +61,7 @@ export default function EditProfile() {
     return downloadUrl;
   };
 
-  // ✅ Save Changes
+  // Save Changes
   const saveChanges = async () => {
     try {
       setUploading(true);
@@ -79,12 +79,12 @@ export default function EditProfile() {
 
       await updateDoc(userRef, updates);
 
-      // ✅ Update Auth email
+      // Update Auth email
       if (email !== user.email) {
         await updateEmail(auth.currentUser, email);
       }
 
-      // ✅ Update password
+      // Update password
       if (password.trim() !== "") {
         await updatePassword(auth.currentUser, password);
       }

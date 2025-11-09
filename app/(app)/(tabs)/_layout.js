@@ -16,7 +16,7 @@ export default function TabLayout() {
             tabBarLabelStyle: styles.tabLabel,
           }}
         >
-          {/* 🏠 Home */}
+          {/* Home */}
           <Tabs.Screen
             name="home"
             options={{
@@ -32,7 +32,7 @@ export default function TabLayout() {
             }}
           />
 
-          {/* 📋 Report */}
+          {/* Report */}
           <Tabs.Screen
             name="report"
             options={{
@@ -48,7 +48,7 @@ export default function TabLayout() {
             }}
           />
 
-          {/* 🐕 Adopt */}
+          {/* Adopt */}
           <Tabs.Screen
             name="adopt"
             options={{
@@ -64,14 +64,14 @@ export default function TabLayout() {
             }}
           />
 
-          {/* 💬 Community */}
+          {/* Community */}
           <Tabs.Screen
             name="community"
             options={{
               title: "Community",
               tabBarIcon: ({ focused, size }) => (
                 <AntDesign
-                  name="message" // ✅ fixed icon name
+                  name="message"
                   size={size}
                   color={focused ? "#60a5fa" : "#9ca3af"}
                   style={focused && styles.activeIcon}
@@ -80,7 +80,7 @@ export default function TabLayout() {
             }}
           />
 
-          {/* 👤 Profile */}
+          {/* Profile */}
           <Tabs.Screen
             name="profile"
             options={{

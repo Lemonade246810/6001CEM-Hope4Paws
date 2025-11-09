@@ -7,7 +7,7 @@ export default function Category({ selectedCategory, setSelectedCategory }) {
 
   const [categoryList, setCategoryList] = useState([]);
 
-  // 🔥 Mapping UI label -> Firestore species
+  // Mapping UI label -> Firestore species
   const mapCategoryToSpecies = {
     Cats: "Cat",
     Dogs: "Dog",

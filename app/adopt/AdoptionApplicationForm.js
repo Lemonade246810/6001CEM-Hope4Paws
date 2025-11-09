@@ -33,7 +33,7 @@ export default function AdoptionApplicationForm() {
     message: "",
   });
 
-  // ✅ Fetch Pet Data
+  // Fetch Pet Data
   useEffect(() => {
     const fetchPet = async () => {
       try {
@@ -55,7 +55,7 @@ export default function AdoptionApplicationForm() {
     fetchPet();
   }, [petId]);
 
-  // ✅ Submit Form
+  // Submit Form
   const handleSubmit = async () => {
     if (!form.name || !form.email || !form.phone) {
       Alert.alert("Missing Information", "Please fill in all required fields.");
@@ -88,7 +88,7 @@ export default function AdoptionApplicationForm() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {/* ✅ BACK BUTTON */}
+        {/* BACK BUTTON */}
         <TouchableOpacity
           onPress={() => router.back()}
           style={styles.backButton}
@@ -96,7 +96,7 @@ export default function AdoptionApplicationForm() {
           <Text style={styles.backText}>← Back</Text>
         </TouchableOpacity>
 
-        {/* ✅ Pet Header */}
+        {/* Pet Header */}
         {pet && (
           <View style={styles.petHeader}>
             <Image source={{ uri: pet.imageUrl }} style={styles.image} />
@@ -112,7 +112,7 @@ export default function AdoptionApplicationForm() {
 
         <Text style={styles.title}>Adoption Application</Text>
 
-        {/* ✅ Form Fields */}
+        {/* Form Fields */}
         <Text style={styles.label}>Full Name</Text>
         <TextInput
           style={styles.input}
@@ -148,7 +148,7 @@ export default function AdoptionApplicationForm() {
           onChangeText={(t) => setForm({ ...form, message: t })}
         />
 
-        {/* ✅ Submit */}
+        {/* Submit */}
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           <Text style={styles.submitButtonText}>Submit Application</Text>
         </TouchableOpacity>
@@ -157,13 +157,13 @@ export default function AdoptionApplicationForm() {
   );
 }
 
-//
-// ✅ STYLES
-//
+
+// STYLES
+
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, backgroundColor: "#fff" },
 
-  // ✅ Back Button
+  // Back Button
   backButton: {
     marginTop: 10,
     marginBottom: 10,
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     color: "#1E3A8A",
   },
 
-  // ✅ Pet Section
+  // Pet Section
   petHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
 
-  // ✅ Form
+  // Form
   title: {
     fontSize: 24,
     fontWeight: "bold",
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
 
-  // ✅ Submit Button
+  // Submit Button
   submitButton: {
     backgroundColor: "#1E3A8A",
     borderRadius: 10,

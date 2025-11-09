@@ -10,12 +10,12 @@ export default function VolunteerDashboard() {
   const { user } = useAuth();
   const router = useRouter();
 
-  // ✅ Real-time alert listener
+  // Real-time alert listener
   useVolunteerAlerts(user?.userId);
 
   const [assignedReports, setAssignedReports] = useState([]);
 
-  // ✅ Live Assigned Reports List
+  // Live Assigned Reports List
   useEffect(() => {
     if (!user?.userId) return;
 
@@ -34,7 +34,7 @@ export default function VolunteerDashboard() {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#FFF7ED" }}>
-      {/* ✅ Remove header — now handled by (volunteer)/_layout.js */}
+      {/* Remove header — now handled by (volunteer)/_layout.js */}
 
       <ScrollView style={{ padding: 20 }}>
         <Text style={{ fontSize: 20, fontWeight: "700", marginBottom: 15 }}>

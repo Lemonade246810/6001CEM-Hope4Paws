@@ -1,5 +1,5 @@
 // PetDetailsScreen.js
-import { useLocalSearchParams } from 'expo-router'; // ✅ import this hook
+import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -12,7 +12,7 @@ import {
 import { getPetfinderToken } from '../../config/petfinder';
 
 export default function PetDetailsScreen() {
-  const { id } = useLocalSearchParams(); // ✅ get ID from the route
+  const { id } = useLocalSearchParams(); // get ID from the route
   const [pet, setPet] = useState(null);
   const [loading, setLoading] = useState(true);
 

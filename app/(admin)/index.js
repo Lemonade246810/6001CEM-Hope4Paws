@@ -38,14 +38,14 @@ export default function AdminDashboard() {
   useEffect(() => {
     const unsubs = [];
 
-    // ✅ Total reports
+    // Total reports
     unsubs.push(
       onSnapshot(refs.reports, (snap) =>
         setStats(s => ({ ...s, total: snap.size }))
       )
     );
 
-    // ✅ Pending reports
+    // Pending reports
     unsubs.push(
       onSnapshot(
         query(refs.reports, where("status", "==", "Pending")),
@@ -53,7 +53,7 @@ export default function AdminDashboard() {
       )
     );
 
-    // ✅ Assigned reports
+    // Assigned reports
     unsubs.push(
       onSnapshot(
         query(refs.reports, where("status", "==", "Assigned")),
@@ -61,7 +61,7 @@ export default function AdminDashboard() {
       )
     );
 
-    // ✅ Completed reports
+    // Completed reports
     unsubs.push(
       onSnapshot(
         query(refs.reports, where("status", "==", "Completed")),
@@ -69,7 +69,7 @@ export default function AdminDashboard() {
       )
     );
 
-    // ✅ Volunteers
+    // Volunteers
     unsubs.push(
       onSnapshot(
         query(refs.users, where("role", "==", "volunteer")),

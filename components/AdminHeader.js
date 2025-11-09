@@ -22,7 +22,7 @@ export default function AdminHeader({ title }) {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
-        {/* 🔙 Left section (Back + Titles) */}
+        {/* Left section (Back + Titles) */}
         <View style={styles.leftSection}>
           {isSubPage && (
             <TouchableOpacity
@@ -42,7 +42,7 @@ export default function AdminHeader({ title }) {
           </View>
         </View>
 
-        {/* ⚙️ Right section (icons + logout) */}
+        {/* Right section (icons + logout) */}
         <View style={styles.icons}>
           <TouchableOpacity
             onPress={() => router.push("/(admin)/manageNotifications")}

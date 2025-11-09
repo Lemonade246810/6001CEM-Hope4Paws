@@ -1,4 +1,4 @@
-// ✅ SAFE for Expo Go + ready for dev build
+// SAFE for Expo Go + ready for dev build
 import Constants from "expo-constants";
 import { useEffect, useState } from "react";
 
@@ -6,7 +6,7 @@ export function useLocalNotificationTest() {
   const [Notifications, setNotifications] = useState(null);
 
   useEffect(() => {
-    // ✅ Only load expo-notifications if not running in Expo Go
+    // Only load expo-notifications if not running in Expo Go
     if (Constants.appOwnership !== "expo") {
       import("expo-notifications").then((module) => {
         const notif = module.default || module;
@@ -29,10 +29,10 @@ export function useLocalNotificationTest() {
     }
   }, []);
 
-  // ✅ Trigger notification based on environment
+  // Trigger notification based on environment
   const triggerLocalNotification = async () => {
     if (Constants.appOwnership === "expo") {
-      // ✅ Expo Go fallback
+      // Expo Go fallback
       alert("🔔 Simulated notification (Expo Go mode)");
       return;
     }

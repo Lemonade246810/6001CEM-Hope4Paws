@@ -15,7 +15,7 @@ export default function ManageSettings() {
   const [emailAlerts, setEmailAlerts] = useState(true);
   const [pushAlerts, setPushAlerts] = useState(true);
 
-  // ✅ Confirm logout first
+  // Confirm logout first
   const confirmLogout = () => {
     Alert.alert(
       "Logout",
@@ -38,7 +38,7 @@ export default function ManageSettings() {
     <View style={styles.container}>
       <Text style={styles.header}>⚙️ Admin Settings</Text>
 
-      {/* ✅ Notifications Section */}
+      {/* Notifications Section */}
       <Text style={styles.sectionTitle}>Notifications</Text>
 
       <View style={styles.card}>
@@ -59,7 +59,7 @@ export default function ManageSettings() {
         </View>
       </View>
 
-      {/* ✅ Account Section */}
+      {/* Account Section */}
       <Text style={styles.sectionTitle}>Account</Text>
 
       <TouchableOpacity style={styles.cardButton} onPress={confirmLogout}>
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
 
-  // ✅ Card container
+  // Card container
   card: {
     backgroundColor: "#FFFFFF",
     borderRadius: 14,
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 
-  // ✅ Logout button section
+  // Logout button section
   cardButton: {
     backgroundColor: "#DC2626",
     paddingVertical: 14,

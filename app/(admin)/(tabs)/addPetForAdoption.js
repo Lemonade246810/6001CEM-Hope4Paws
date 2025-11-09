@@ -17,7 +17,7 @@ export default function AddPetForAdoption() {
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
 
-  // ✅ Pet Details
+  // Pet Details
   const [name, setName] = useState("");
   const [species, setSpecies] = useState("");
   const [breed, setBreed] = useState("");
@@ -31,7 +31,7 @@ export default function AddPetForAdoption() {
   const [deposit, setDeposit] = useState("");
   const [isSpayedOrNeutered, setIsSpayedOrNeutered] = useState("");
 
-  // ✅ Pick Image
+  // Pick Image
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
@@ -44,7 +44,7 @@ export default function AddPetForAdoption() {
     }
   };
 
-  // ✅ Upload image to Firebase Storage
+  // Upload image to Firebase Storage
   const uploadImage = async () => {
     if (!image) return null;
 
@@ -64,7 +64,7 @@ export default function AddPetForAdoption() {
     return downloadURL;
   };
 
-  // ✅ Submit to Firestore
+  // Submit to Firestore
   const handleSubmit = async () => {
     if (!name || !species || !breed || !gender || !shelter) {
       Alert.alert("Missing Fields", "Please fill in all required fields.");
@@ -92,7 +92,7 @@ export default function AddPetForAdoption() {
         createdAt: serverTimestamp(),
       });
 
-      Alert.alert("✅ Success", "Pet added to adoption list!");
+      Alert.alert(" Success", "Pet added to adoption list!");
 
       // Reset
       setImage(null);
@@ -119,7 +119,7 @@ export default function AddPetForAdoption() {
     <ScrollView style={styles.container}>
       <Text style={styles.header}>Add New Pet for Adoption</Text>
 
-      {/* ✅ Image Picker */}
+      {/* Image Picker */}
       <TouchableOpacity style={styles.imageBox} onPress={pickImage}>
         {image ? (
           <Image source={{ uri: image }} style={styles.image} />
@@ -128,7 +128,7 @@ export default function AddPetForAdoption() {
         )}
       </TouchableOpacity>
 
-      {/* ✅ Form Fields */}
+      {/* Form Fields */}
       <TextInput placeholder="Name *" placeholderTextColor="#4B5563" style={styles.input} value={name} onChangeText={setName} />
       <TextInput placeholder="Species (Dog, Cat...) *" placeholderTextColor="#4B5563" style={styles.input} value={species} onChangeText={setSpecies} />
       <TextInput placeholder="Breed *" placeholderTextColor="#4B5563" style={styles.input} value={breed} onChangeText={setBreed} />
@@ -145,7 +145,7 @@ export default function AddPetForAdoption() {
       <TextInput placeholder="Is Spayed/Neutered? (yes/no)" placeholderTextColor="#4B5563" style={styles.input}
         value={isSpayedOrNeutered} onChangeText={setIsSpayedOrNeutered} />
 
-      {/* ✅ Submit Button */}
+      {/* Submit Button */}
       <TouchableOpacity
         style={styles.submitBtn}
         onPress={handleSubmit}

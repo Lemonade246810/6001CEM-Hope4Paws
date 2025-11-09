@@ -5,7 +5,7 @@ import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { db } from "../../config/firebaseConfig";
 
 export default function FeaturedPets({ selectedCategory }) {
-  const [pets, setPets] = useState([]);     // ✅ FIX 1: Add state
+  const [pets, setPets] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,7 +18,7 @@ export default function FeaturedPets({ selectedCategory }) {
 
       const q = query(
         collection(db, "Animals"),
-        where("species", "==", selectedCategory) // ✅ "Cat" or "Dog"
+        where("species", "==", selectedCategory) // "Cat" or "Dog"
       );
 
       const snapshot = await getDocs(q);
@@ -42,7 +42,7 @@ export default function FeaturedPets({ selectedCategory }) {
         Featured Pets
       </Text>
 
-      {/* ✅ FIX 2: Replace wrong variable "category" with selectedCategory */}
+      {/* FIX 2: Replace wrong variable "category" with selectedCategory */}
       {loading ? (
         <Text>Loading...</Text>
       ) : pets.length === 0 ? (

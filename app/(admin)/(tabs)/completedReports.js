@@ -22,7 +22,7 @@ export default function CompletedReports() {
     []
   );
 
-  // ✅ Load Completed reports LIVE
+  // Load Completed reports LIVE
   useEffect(() => {
     const q = query(
       refs.reportsCol,

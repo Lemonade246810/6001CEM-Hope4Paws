@@ -5,10 +5,10 @@ import AdminHeader from "../../components/AdminHeader";
 export default function AdminLayout() {
   return (
     <View style={styles.wrapper}>
-      {/* ✅ Always visible Admin Header */}
+      {/* Always visible Admin Header */}
       <AdminHeader title="Hope4Paws Admin Panel" />
 
-      {/* ✅ Admin Stack Navigation */}
+      {/* Admin Stack Navigation */}
       <Stack
         screenOptions={{
           headerShown: false,

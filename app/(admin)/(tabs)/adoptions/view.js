@@ -104,7 +104,7 @@ export default function AdminAdoptionView() {
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Adoption Application</Text>
 
-      {/* ✅ Clickable Image → Full Screen */}
+      {/* Clickable Image → Full Screen */}
       <TouchableOpacity
         style={styles.imageWrapper}
         onPress={() =>
@@ -122,7 +122,7 @@ export default function AdminAdoptionView() {
         />
       </TouchableOpacity>
 
-      {/* ✅ Pet Details */}
+      {/* Pet Details */}
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Pet Information</Text>
         <Text style={styles.info}>Name: {pet?.name}</Text>
@@ -137,7 +137,7 @@ export default function AdminAdoptionView() {
         </Text>
       </View>
 
-      {/* ✅ Applicant Details */}
+      {/* Applicant Details */}
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Applicant Information</Text>
         <Text style={styles.info}>Name: {app.name}</Text>
@@ -145,13 +145,13 @@ export default function AdminAdoptionView() {
         <Text style={styles.info}>Phone: {app.phone}</Text>
       </View>
 
-      {/* ✅ Message */}
+      {/* Message */}
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Message</Text>
         <Text style={styles.info}>{app.message}</Text>
       </View>
 
-      {/* ✅ Buttons */}
+      {/* Buttons */}
       <TouchableOpacity
         style={[styles.btn, styles.approve]}
         onPress={approveAdoption}

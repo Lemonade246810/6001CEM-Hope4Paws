@@ -2,7 +2,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function VolunteerNotifications() {
   const mockNotifications = [
-    { id: 1, message: "You’ve been assigned a new rescue case 🐶" },
+    { id: 1, message: "You've been assigned a new rescue case 🐶" },
     { id: 2, message: "A user updated a report in your area 📍" },
     { id: 3, message: "Meeting scheduled for Sunday at 3 PM 📅" },
   ];

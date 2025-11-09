@@ -33,14 +33,14 @@ export default function AdoptionStatus() {
     setLoading(true);
 
     try {
-      // ✅ Main Query (requires index)
+      // Main Query (requires index)
       const q = query(
         collection(db, "AdoptionApplications"),
         where("email", "==", user.email),
         orderBy("createdAt", "desc")
       );
 
-      // ✅ Real-time listener
+      // Real-time listener
       const unsub = onSnapshot(
         q,
         async (snapshot) => {
@@ -49,7 +49,7 @@ export default function AdoptionStatus() {
           for (const docSnap of snapshot.docs) {
             const app = { id: docSnap.id, ...docSnap.data() };
 
-            // ✅ Fetch pet image
+            // Fetch pet image
             let petImage = null;
             if (app.petId) {
               const petRef = doc(db, "Animals", app.petId);
@@ -67,11 +67,11 @@ export default function AdoptionStatus() {
           setLoading(false);
         },
 
-        // ✅ ERROR HANDLING
+        // ERROR HANDLING
         async (error) => {
           console.error("Firestore Error:", error);
 
-          // ✅ If index missing → use fallback
+          // If index missing → use fallback
           if (error.code === "failed-precondition") {
             console.warn(
               "⚠️ Missing Firestore index. Falling back to no-orderBy query."
@@ -119,7 +119,7 @@ export default function AdoptionStatus() {
     }
   }, [user]);
 
-  // ✅ Loading state
+  // Loading state
   if (loading) {
     return (
       <View style={styles.center}>
@@ -128,7 +128,7 @@ export default function AdoptionStatus() {
     );
   }
 
-  // ✅ No applications
+  // No applications
   if (applications.length === 0) {
     return (
       <View style={styles.center}>
@@ -137,12 +137,12 @@ export default function AdoptionStatus() {
     );
   }
 
-  // ✅ Display applications
+  // Display applications
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <ScrollView style={styles.container}>
 
-        {/* ✅ BACK BUTTON (now clickable) */}
+        {/* BACK BUTTON (now clickable) */}
         <TouchableOpacity
           onPress={() => router.back()}
           style={styles.backButton}
@@ -188,9 +188,8 @@ export default function AdoptionStatus() {
 
 }
 
-//
-// ✅ STYLES
-//
+// STYLES
+
 const styles = StyleSheet.create({
   container: { padding: 16, backgroundColor: "#fff" },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },

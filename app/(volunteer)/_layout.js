@@ -5,7 +5,7 @@ import VolunteerHeader from "../../components/VolunteerHeader";
 export default function VolunteerLayout() {
   return (
     <View style={styles.wrapper}>
-      {/* ✅ Fixed top header for all volunteer pages */}
+      {/* Fixed top header for all volunteer pages */}
       <VolunteerHeader title="Hope4Paws Volunteer Dashboard" />
 
       {/* Nested screens (dashboard, settings, etc.) */}

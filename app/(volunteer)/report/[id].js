@@ -2,13 +2,13 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
-    Alert,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -107,7 +107,7 @@ export default function VolunteerReportDetails() {
         <View style={{ height: 100 }} />
       </ScrollView>
 
-      {/* ✅ Fixed bottom button */}
+      {/* Fixed bottom button */}
       <View style={styles.bottomBar}>
         <TouchableOpacity style={styles.completeBtn} onPress={handleMarkCompleted}>
           <Text style={styles.completeText}>✅ Mark as Completed</Text>
