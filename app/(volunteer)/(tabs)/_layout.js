@@ -17,7 +17,7 @@ export default function VolunteerTabsLayout() {
 
     const q = query(
       collection(db, "AnimalReports"),
-      where("assignedTo", "==", user.userId),
+      where("assignedVolunteerId", "==", user.userId),
       where("status", "==", "Assigned")
     );
 

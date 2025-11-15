@@ -1,6 +1,6 @@
 import * as ImagePicker from "expo-image-picker";
 import { router, useLocalSearchParams } from "expo-router";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, serverTimestamp } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useEffect, useState } from "react";
 import {
@@ -26,7 +26,6 @@ export default function ShareStory() {
     if (params.petImage) setImage(params.petImage);
   }, [params]);
 
-
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       quality: 0.8,
@@ -45,24 +44,37 @@ export default function ShareStory() {
 
     setUploading(true);
 
-    let imageUrl = null;
-
     try {
+      // get Firestore user document
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        Alert.alert("Error", "User profile not found in Firestore.");
+        return;
+      }
+
+      const userData = userSnap.data();
+
+      let uploadedImageUrl = null;
+
+      // Upload image if exists
       if (image) {
         const imageRef = ref(storage, `community/${Date.now()}.jpg`);
         const img = await fetch(image);
         const bytes = await img.blob();
         await uploadBytes(imageRef, bytes);
-        imageUrl = await getDownloadURL(imageRef);
+        uploadedImageUrl = await getDownloadURL(imageRef);
       }
 
+      // Add new community post WITH username & avatar
       await addDoc(collection(db, "CommunityPosts"), {
-        userName: user.displayName || "Anonymous",
-        userEmail: user.email,
         userId: user.uid,
-        userAvatar: user.photoURL || null,
-        caption,
-        imageUrl,
+        userEmail: user.email,
+        username: userData.username,
+        userProfile: userData.profileImage,
+        storyText: caption,
+        imageUrl: uploadedImageUrl,
         likes: [],
         createdAt: serverTimestamp(),
       });
@@ -70,12 +82,13 @@ export default function ShareStory() {
       Alert.alert("Posted!", "Your story has been shared.");
       router.back();
     } catch (err) {
-      console.error("Upload Error:", err);
-      Alert.alert("Error", "Failed to share your story.");
+      console.error(err);
+      Alert.alert("Error", "Failed to post your story.");
     }
 
     setUploading(false);
   };
+
 
   return (
     <SafeAreaView style={styles.container}>

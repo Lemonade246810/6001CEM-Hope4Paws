@@ -5,7 +5,13 @@ import {
   signOut,
   updateProfile,
 } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+
+import {
+  doc,
+  getDoc,
+  setDoc
+} from "firebase/firestore";
+
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth, db } from "../config/firebaseConfig";
 
@@ -15,33 +21,37 @@ export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(undefined);
 
-  // Create default admin + volunteer accounts once
+  // Update local user data (used for Edit Profile)
+  const setUserData = (newData) => {
+    setUser((prev) => ({ ...prev, ...newData }));
+  };
+
+  // ---------------------------------------------------------------------------
+  // Run default account creation ONCE per project
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     const setupDefaults = async () => {
       try {
-        await Promise.all([ensureAdmin(), ensureVolunteer()]);
+        await ensureAdmin();
+        await ensureVolunteer();
       } catch (error) {
-        console.log("⚠️ Default account setup skipped:", error.message);
+        console.log("⚠️ Default setup skipped:", error.message);
       }
     };
     setupDefaults();
   }, []);
 
-  // Default admin account
+  // Admin account seed
   const ensureAdmin = async () => {
-    const adminEmail = "sulaiman@hope4paws.com";
-    const adminPassword = "hopeadmin123";
+    const email = "sulaiman@hope4paws.com";
+    const password = "hopeadmin123";
 
     try {
-      const adminUser = await createUserWithEmailAndPassword(
-        auth,
-        adminEmail,
-        adminPassword
-      );
+      const adminUser = await createUserWithEmailAndPassword(auth, email, password);
 
       await setDoc(doc(db, "users", adminUser.user.uid), {
         username: "Sulaiman Sidek",
-        email: adminEmail,
+        email,
         role: "admin",
         userId: adminUser.user.uid,
         phone: "",
@@ -57,25 +67,21 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
 
-  // Default volunteer account
+  // Volunteer account seed
   const ensureVolunteer = async () => {
-    const volEmail = "volunteer@hope4paws.com";
-    const volPassword = "hopevol123";
+    const email = "volunteer@hope4paws.com";
+    const password = "hopevol123";
 
     try {
-      const volUser = await createUserWithEmailAndPassword(
-        auth,
-        volEmail,
-        volPassword
-      );
+      const volUser = await createUserWithEmailAndPassword(auth, email, password);
 
       await setDoc(doc(db, "users", volUser.user.uid), {
         username: "Default Volunteer",
-        email: volEmail,
+        email,
         role: "volunteer",
+        isAvailable: true,
         userId: volUser.user.uid,
         phone: "",
-        isAvailable: true,
         profileImage: "https://cdn-icons-png.flaticon.com/512/149/149071.png",
         createdAt: new Date(),
       });
@@ -88,12 +94,10 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
 
-  // Firestore user data fetcher
+  // Fetch Firestore user details
   const fetchUserData = async (uid) => {
     try {
-      const ref = doc(db, "users", uid);
-      const snap = await getDoc(ref);
-
+      const snap = await getDoc(doc(db, "users", uid));
       if (!snap.exists()) return null;
       return { userId: uid, ...snap.data() };
     } catch (error) {
@@ -102,7 +106,7 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
 
-  // Auth listener
+  // Auth state listener
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
@@ -118,7 +122,7 @@ export const AuthContextProvider = ({ children }) => {
     return unsub;
   }, []);
 
-  // Login function
+  // Login
   const login = async (email, password) => {
     try {
       const res = await signInWithEmailAndPassword(auth, email, password);
@@ -131,18 +135,17 @@ export const AuthContextProvider = ({ children }) => {
     } catch (e) {
       let msg = "Login failed.";
       if (e.code.includes("invalid-email")) msg = "Invalid email address.";
-      else if (e.code.includes("wrong-password")) msg = "Wrong password.";
-      else if (e.code.includes("user-not-found")) msg = "User not found.";
+      if (e.code.includes("wrong-password")) msg = "Wrong password.";
+      if (e.code.includes("user-not-found")) msg = "User not found.";
       return { success: false, msg };
     }
   };
 
-  // Register function (fixed & complete)
+  // Registration
   const register = async (email, password, username) => {
     try {
       const res = await createUserWithEmailAndPassword(auth, email, password);
 
-      // update Firebase Auth profile name
       await updateProfile(res.user, {
         displayName: username,
         photoURL: "https://cdn-icons-png.flaticon.com/512/149/149071.png",
@@ -152,8 +155,8 @@ export const AuthContextProvider = ({ children }) => {
         userId: res.user.uid,
         username,
         email,
-        phone: "",
         role: "user",
+        phone: "",
         profileImage: "https://cdn-icons-png.flaticon.com/512/149/149071.png",
         createdAt: new Date(),
       };
@@ -167,7 +170,7 @@ export const AuthContextProvider = ({ children }) => {
     } catch (e) {
       let msg = "Registration failed.";
       if (e.code.includes("email-already-in-use")) msg = "Email already in use.";
-      else if (e.code.includes("weak-password")) msg = "Password too weak.";
+      if (e.code.includes("weak-password")) msg = "Password too weak.";
       return { success: false, msg };
     }
   };
@@ -186,15 +189,19 @@ export const AuthContextProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated, login, register, logout }}
+      value={{
+        user,
+        isAuthenticated,
+        login,
+        register,
+        logout,
+        setUserData,
+      }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be inside provider");
-  return ctx;
-};
+// Hook
+export const useAuth = () => useContext(AuthContext);

@@ -66,15 +66,18 @@ export default function ManageReports() {
   // Assign volunteer to report
   const handleAssign = async (report) => {
     const volunteerId = selection[report.id];
+
     if (!volunteerId) {
       Alert.alert("Select Volunteer", "Please choose a volunteer to assign.");
       return;
     }
+
     if (loadingRef.current) return;
 
     try {
       loadingRef.current = true;
 
+      // Get the selected volunteer record
       const volunteer = volunteers.find(
         (v) => (v.userId || v.id) === volunteerId
       );
@@ -84,14 +87,24 @@ export default function ManageReports() {
         return;
       }
 
+      const volunteerName = volunteer.username || volunteer.fullName || volunteer.email || "Volunteer";
+
+      // Update the report with consistent field names
       await updateDoc(doc(db, "AnimalReports", report.id), {
-        assignedVolunteerId: volunteerId,
-        assignedVolunteerName: volunteer.username || volunteer.email,
+        assignedVolunteerId: volunteerId,          // <-- used by VolunteerDashboard
+        assignedVolunteerName: volunteerName,       // <-- displayed in UI
+        assignedTo: volunteerId,                    // <-- optional but good for consistency
         assignedAt: serverTimestamp(),
         status: "Assigned",
       });
 
-      Alert.alert("✅ Assigned", `Assigned to ${volunteer.username}`);
+      // auto toggle availability OFF
+      await updateDoc(doc(db, "users", volunteerId), {
+        isAvailable: false,
+      });
+
+      Alert.alert("✅ Assigned", `Assigned to ${volunteerName}`);
+
     } catch (err) {
       console.error("Assign error:", err);
       Alert.alert("Error", "Failed to assign report. Try again.");

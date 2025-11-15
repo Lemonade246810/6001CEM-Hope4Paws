@@ -26,7 +26,6 @@ export default function CommunityPage() {
   const [posts, setPosts] = useState([]);
   const user = auth.currentUser;
 
-  // FETCH POSTS LIVE
   useEffect(() => {
     const q = query(
       collection(db, "CommunityPosts"),
@@ -44,7 +43,6 @@ export default function CommunityPage() {
     return unsubscribe;
   }, []);
 
-  // DELETE STORY
   const deleteStory = (postId) => {
     Alert.alert(
       "Delete Story",
@@ -57,10 +55,8 @@ export default function CommunityPage() {
           onPress: async () => {
             try {
               await deleteDoc(doc(db, "CommunityPosts", postId));
-              Alert.alert("Deleted", "Your story has been removed.");
             } catch (error) {
-              console.log(error);
-              Alert.alert("Error", "Failed to delete the story.");
+              Alert.alert("Error", "Failed to delete story.");
             }
           },
         },
@@ -68,7 +64,6 @@ export default function CommunityPage() {
     );
   };
 
-  // LIKE / UNLIKE
   const toggleLike = async (postId, currentLikes) => {
     const userId = user?.uid;
     if (!userId) return;
@@ -81,13 +76,10 @@ export default function CommunityPage() {
     await updateDoc(postRef, { likes: updatedLikes });
   };
 
-  // RENDER UI
-
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Community Stories</Text>
 
-      {/* SHARE BUTTON */}
       <TouchableOpacity
         style={styles.shareButton}
         onPress={() => router.push("/community/ShareStory")}
@@ -95,16 +87,17 @@ export default function CommunityPage() {
         <Text style={styles.shareText}>+ Share Your Story</Text>
       </TouchableOpacity>
 
-      {/* POST LIST */}
       {posts.map((post) => {
         const isOwner = post.userEmail === user?.email;
 
         return (
           <View key={post.id} style={styles.card}>
-            {/* USER HEADER */}
             <View style={styles.headerRow}>
               <View style={styles.userInfo}>
-                <Image source={{ uri: post.userProfile }} style={styles.avatar} />
+                <Image
+                  source={{ uri: post.userProfile }}
+                  style={styles.avatar}
+                />
 
                 <View>
                   <Text style={styles.username}>{post.username}</Text>
@@ -116,18 +109,12 @@ export default function CommunityPage() {
                 </View>
               </View>
 
-              {/* 3-DOT MENU (ONLY FOR OWNER) */}
               {isOwner && (
                 <TouchableOpacity
                   onPress={() =>
-                    Alert.alert("Story Options", "", [
+                    Alert.alert("Options", "", [
                       {
-                        text: "Edit Story",
-                        onPress: () =>
-                          router.push(`/community/edit/${post.id}`),
-                      },
-                      {
-                        text: "Delete Story",
+                        text: "Delete",
                         style: "destructive",
                         onPress: () => deleteStory(post.id),
                       },
@@ -140,7 +127,6 @@ export default function CommunityPage() {
               )}
             </View>
 
-            {/* POST IMAGE */}
             {post.imageUrl && (
               <Image
                 source={{ uri: post.imageUrl }}
@@ -148,10 +134,8 @@ export default function CommunityPage() {
               />
             )}
 
-            {/* CAPTION */}
             <Text style={styles.caption}>{post.storyText}</Text>
 
-            {/* LIKE BUTTON */}
             <TouchableOpacity
               onPress={() => toggleLike(post.id, post.likes || [])}
             >
@@ -171,7 +155,6 @@ export default function CommunityPage() {
               </Text>
             </TouchableOpacity>
 
-            {/* LIKE COUNT */}
             <Text style={styles.likesCount}>
               {(post.likes || []).length} likes
             </Text>

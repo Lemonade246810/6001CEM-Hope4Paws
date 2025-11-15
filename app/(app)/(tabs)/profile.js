@@ -11,10 +11,11 @@ import {
   View,
 } from "react-native";
 import { auth, db } from "../../../config/firebaseConfig";
+import { useAuth } from "../../../context/authContext";
 
 export default function Profile() {
   const router = useRouter();
-  const user = auth.currentUser;
+  const { user } = useAuth();
 
   const [adoptedPets, setAdoptedPets] = useState([]);
   const [loadingPets, setLoadingPets] = useState(true);
@@ -77,9 +78,7 @@ export default function Profile() {
       <View style={styles.profileCard}>
         <Image
           source={{
-            uri:
-              user?.profileImage ||
-              "https://cdn-icons-png.flaticon.com/512/149/149071.png",
+            uri: user?.profileImage || "https://cdn-icons-png.flaticon.com/512/149/149071.png"
           }}
           style={styles.avatar}
         />

@@ -245,6 +245,7 @@ export default function ReportScreen() {
       />
       <TextInput
         placeholder="Description"
+        placeholderTextColor="#555"
         style={[styles.input, { height: 100, textAlignVertical: "top" }]}
         multiline
         value={form.description}
@@ -303,6 +304,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 12,
     marginBottom: 12,
+    color: "#000",
   },
   submitButton: {
     backgroundColor: "#E63946",
