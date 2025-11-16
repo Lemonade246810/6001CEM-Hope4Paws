@@ -1,25 +1,36 @@
-/**
- * Hope4Paws Cloud Functions
- * Handles automatic notifications to nearby shelters & volunteers
- * when a new animal report is created.
- */
+// Hope4Paws Cloud Functions – Gmail SMTP
 
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
-const { getFirestore } = require("firebase-admin/firestore");
-const { getMessaging } = require("firebase-admin/messaging");
+const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const { defineSecret } = require("firebase-functions/params");
 const admin = require("firebase-admin");
-const fetch = require("node-fetch"); // npm i node-fetch@2 if not installed
+const nodemailer = require("nodemailer");
 
 admin.initializeApp();
-const db = getFirestore();
 
-const MAX_DISTANCE_KM = 15; // limit for "nearby"
-const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || null;
+const db = admin.firestore();
+const auth = admin.auth();
 
-// ---------- helpers ----------
-function toRad(d) {
-  return (d * Math.PI) / 180;
+// Load secrets from Secret Manager
+const GMAIL_EMAIL = defineSecret("GMAIL_EMAIL");
+const GMAIL_APP_PASSWORD = defineSecret("GMAIL_APP_PASSWORD");
+
+// SMTP Transport
+function createTransport() {
+  return nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.GMAIL_EMAIL,
+      pass: process.env.GMAIL_APP_PASSWORD,
+    },
+  });
 }
+
+// Distance Helpers
+function toRad(v) {
+  return (v * Math.PI) / 180;
+}
+
 function distanceKm(lat1, lon1, lat2, lon2) {
   const R = 6371;
   const dLat = toRad(lat2 - lat1);
@@ -29,54 +40,59 @@ function distanceKm(lat1, lon1, lat2, lon2) {
     Math.cos(toRad(lat1)) *
       Math.cos(toRad(lat2)) *
       Math.sin(dLon / 2) ** 2;
+
   return 2 * R * Math.asin(Math.sqrt(a));
 }
 
-// optional SendGrid email helper
-async function sendEmail(toEmails, subject, text) {
-  if (!SENDGRID_API_KEY || !toEmails.length) return;
-  const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${SENDGRID_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      personalizations: [{ to: toEmails.map((e) => ({ email: e })) }],
-      from: { email: "alerts@hope4paws.app", name: "Hope4Paws Alerts" },
+// Email Helper
+async function sendEmail(to, subject, html) {
+  const transporter = createTransport();
+
+  try {
+    const info = await transporter.sendMail({
+      from: `"Hope4Paws Team" <${process.env.GMAIL_EMAIL}>`,
+      to,
       subject,
-      content: [{ type: "text/plain", value: text }],
-    }),
-  });
-  if (!res.ok) console.error("SendGrid error:", await res.text());
+      html,
+    });
+
+    console.log("📨 Gmail SMTP sent:", info.accepted);
+  } catch (err) {
+    console.error("❌ Gmail SMTP error:", err);
+  }
 }
 
-// ---------- main trigger ----------
+// 1) Notify Shelters & Volunteers When an Animal Report is Created
+
 exports.notifySheltersAndVolunteers = onDocumentCreated(
-  "AnimalReports/{reportId}",
+  {
+    document: "AnimalReports/{reportId}",
+    region: "asia-southeast1",
+    secrets: [GMAIL_EMAIL, GMAIL_APP_PASSWORD],
+  },
   async (event) => {
     const report = event.data.data();
     if (!report) return;
-    console.log("🐾 New animal report created:", report);
 
     const { animalType, condition, address, location = {} } = report;
     const { lat, lng } = location;
 
-    // gather recipients
     const sheltersSnap = await db.collection("Shelters").get();
     const usersSnap = await db.collection("users").get();
 
-    const nearbyShelterEmails = [];
+    const shelterEmails = [];
     const volunteerTokens = [];
+    const MAX_KM = 15;
 
     sheltersSnap.forEach((doc) => {
       const s = doc.data();
       if (!s.email) return;
+
       if (s.location && lat && lng) {
-        const dist = distanceKm(lat, lng, s.location.lat, s.location.lng);
-        if (dist <= MAX_DISTANCE_KM) nearbyShelterEmails.push(s.email);
+        const d = distanceKm(lat, lng, s.location.lat, s.location.lng);
+        if (d <= MAX_KM) shelterEmails.push(s.email);
       } else {
-        nearbyShelterEmails.push(s.email);
+        shelterEmails.push(s.email);
       }
     });
 
@@ -84,47 +100,113 @@ exports.notifySheltersAndVolunteers = onDocumentCreated(
       const u = doc.data();
       if (u.role === "volunteer" && u.isAvailable && u.fcmToken) {
         if (u.location && lat && lng) {
-          const dist = distanceKm(lat, lng, u.location.lat, u.location.lng);
-          if (dist <= MAX_DISTANCE_KM) volunteerTokens.push(u.fcmToken);
+          const d = distanceKm(lat, lng, u.location.lat, u.location.lng);
+          if (d <= MAX_KM) volunteerTokens.push(u.fcmToken);
         } else {
           volunteerTokens.push(u.fcmToken);
         }
       }
     });
 
-    const title = `🚨 ${animalType || "Animal"} reported`;
-    const body = `${condition || "No condition"} - ${address || "Unknown"}`;
+    const title = `🚨 ${animalType || "Animal"} Reported`;
+    const body = `${condition || "Unknown"} at ${address || "Unknown"}`;
 
-    // 1️⃣ FCM multicast push
+    // Push notification
     if (volunteerTokens.length > 0) {
-      await getMessaging().sendEachForMulticast({
+      await admin.messaging().sendEachForMulticast({
         tokens: volunteerTokens,
         notification: { title, body },
         data: { type: "animal_report", reportId: event.params.reportId },
       });
-      console.log(`✅ Push sent to ${volunteerTokens.length} volunteers`);
     }
 
-    // 2️⃣ Optional SendGrid email to shelters
-    if (nearbyShelterEmails.length > 0) {
+    // Email shelter
+    if (shelterEmails.length > 0) {
       await sendEmail(
-        nearbyShelterEmails,
+        shelterEmails[0],
         title,
-        `${body}\n\nPlease check Hope4Paws Admin for more details.`
+        `<p>${body}</p><p>Check admin panel for more details.</p>`
       );
-      console.log(`📧 Emails sent to ${nearbyShelterEmails.length} shelters`);
-    } else {
-      console.log("⚠️ No shelter emails found in range.");
     }
 
-    // 3️⃣ Store an in-app notification document
     await db.collection("Notifications").add({
       title,
       body,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
       type: "animal_report",
       reportId: event.params.reportId,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      address: address || "",
     });
+  }
+);
+
+// 2️) Create Volunteer Account + Send Gmail Welcome Email
+exports.createVolunteerAccount = onCall(
+  {
+    region: "asia-southeast1",
+    secrets: [GMAIL_EMAIL, GMAIL_APP_PASSWORD],
+  },
+  async (request) => {
+    try {
+      if (!request.auth)
+        throw new HttpsError("unauthenticated", "Login required.");
+
+      const callerId = request.auth.uid;
+      const callerDoc = await db.collection("users").doc(callerId).get();
+
+      if (!callerDoc.exists || callerDoc.data().role !== "admin")
+        throw new HttpsError("permission-denied", "Admins only.");
+
+      const { username, email, password, phone, location } = request.data;
+      if (!email || !password || !username)
+        throw new HttpsError(
+          "invalid-argument",
+          "Missing required fields."
+        );
+
+      let userRecord;
+      try {
+        userRecord = await auth.createUser({
+          email,
+          password,
+          displayName: username,
+        });
+      } catch (err) {
+        if (err.code === "auth/email-already-exists")
+          throw new HttpsError("already-exists", "Email already registered.");
+
+        throw new HttpsError("internal", err.message);
+      }
+
+      const uid = userRecord.uid;
+
+      await db.collection("users").doc(uid).set({
+        userId: uid,
+        username,
+        email,
+        phone: phone || "",
+        role: "volunteer",
+        isAvailable: true,
+        location: location || null,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      // Send welcome email using Gmail
+      await sendEmail(
+        email,
+        "Welcome to Hope4Paws 🐾",
+        `
+          <h2>Welcome, ${username}! 🎉</h2>
+          <p>Your volunteer account has been created.</p>
+          <p><b>Email:</b> ${email}</p>
+          <p><b>Password:</b> ${password}</p>
+          <p>Please change your password after your first login.</p>
+        `
+      );
+
+      return { success: true, userId: uid };
+    } catch (err) {
+      console.error("Error:", err);
+      throw new HttpsError("internal", err.message);
+    }
   }
 );

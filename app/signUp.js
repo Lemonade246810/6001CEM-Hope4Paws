@@ -15,8 +15,8 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
-import Loading from "../../components/Loading";
-import { useAuth } from "../../context/authContext";
+import Loading from "../components/Loading";
+import { useAuth } from "../context/authContext";
 
 export default function SignUp() {
   const router = useRouter();
@@ -59,7 +59,7 @@ export default function SignUp() {
           <Image
             style={{ height: hp(35) }}
             resizeMode="contain"
-            source={require('../../assets/images/kitten-puppy-signUp.png')}
+            source={require('../assets/images/kitten-puppy-signUp.png')}
 
           />
         </View>

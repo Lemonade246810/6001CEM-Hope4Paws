@@ -18,8 +18,7 @@ import { useAuth } from "../../../context/authContext";
 import {
   doc,
   onSnapshot,
-  serverTimestamp,
-  updateDoc,
+  updateDoc
 } from "firebase/firestore";
 
 import StatusChip from "../../../components/StatusChip";
@@ -112,17 +111,30 @@ export default function VolunteerReportDetails() {
     try {
       setUpdating(true);
 
+      const completedTime = new Date();
+
       const ref = doc(db, "AnimalReports", report.id);
 
+      // SAFE fallback names (never undefined)
+      const volunteerName =
+        user.fullName || user.username || user.email || "Unknown Volunteer";
+
+      // Update the report
       await updateDoc(ref, {
         status: "Completed",
-        completedAt: serverTimestamp(),
+        completedAt: completedTime,
         completedById: user.userId,
-        completedByName: user.username,
+        completedByName: volunteerName,  // NEVER undefined
+      });
+
+      // Mark volunteer as available again
+      await updateDoc(doc(db, "users", user.userId), {
+        isAvailable: true,
       });
 
       Alert.alert("Success", "Task marked as completed.");
       router.back();
+
     } catch (err) {
       console.error("Complete error:", err);
       Alert.alert("Error", "Failed to mark as completed.");
@@ -294,7 +306,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 
-  /* SUMMARY */
   summaryCard: {
     flexDirection: "row",
     backgroundColor: "#fff",
@@ -323,7 +334,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
 
-  /* FULL IMAGE */
+  // FULL IMAGE
   photo: {
     width: "100%",
     height: 220,
@@ -331,7 +342,7 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
 
-  /* CARDS */
+  // CARDS
   card: {
     backgroundColor: "#FFFFFF",
     borderRadius: 14,

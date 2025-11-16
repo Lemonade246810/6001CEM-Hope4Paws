@@ -10,38 +10,53 @@ const MainLayout = () => {
   const segments = useSegments();
   const router = useRouter();
 
-  // ✅ Hooks always run at top level (never inside conditions)
-  useEffect(() => {
-    if (isAuthenticated === undefined || !segments.length) return;
+  // All public pages (no login required)
+  const publicRoutes = ["signIn", "signUp", "reset"];
 
+  useEffect(() => {
+    if (isAuthenticated === undefined) return; // Wait for Firebase
+
+    const current = segments[0];
+
+    // 🔓 Allow Sign In / Sign Up without redirect
+    if (publicRoutes.includes(current)) return;
+
+    // 🔐 NOT logged in → force to Sign In
     if (!isAuthenticated) {
-      router.replace("/(app)/signIn");
+      router.replace("/signIn");
       return;
     }
 
+    // Wait until Firestore user loads
     if (!user) return;
 
     const isAdmin = user.role === "admin";
     const isVolunteer = user.role === "volunteer";
-    const isInAdmin = segments[0] === "(admin)";
-    const isInVolunteer = segments[0] === "(volunteer)";
-    const isInApp =
-      segments[0] === "(app)" ||
-      segments[0] === "adopt";
 
-    if (isAdmin && !isInAdmin) router.replace("/(admin)/(tabs)/manageReports");
-    else if (isVolunteer && !isInVolunteer) router.replace("/(volunteer)/dashboard");
-    else if (!isAdmin && !isVolunteer && !isInApp && segments[0] !== "adopt")
+    const isInAdmin = current === "(admin)";
+    const isInVolunteer = current === "(volunteer)";
+    const isInApp = current === "(app)" || current === "adopt";
+
+    // 1️⃣ ADMIN REDIRECT
+    if (isAdmin) {
+      if (!isInAdmin) router.replace("/(admin)/(tabs)/manageReports");
+      return;
+    }
+
+    // 2️⃣ VOLUNTEER REDIRECT
+    if (isVolunteer) {
+      if (!isInVolunteer) router.replace("/(volunteer)/dashboard");
+      return;
+    }
+
+    // 3️⃣ NORMAL USER REDIRECT
+    if (!isInApp) {
       router.replace("/(app)/home");
-    
-    if (isInAdmin && !isAdmin) router.replace("/(app)/home");
-    else if (isInVolunteer && !isVolunteer) router.replace("/(app)/home");
-    else if (isInApp && (isAdmin || isVolunteer)) {
-      if (isAdmin) router.replace("/(admin)/(tabs)/manageReports");
-      if (isVolunteer) router.replace("/(volunteer)/(tabs)/dashboard");
+      return;
     }
   }, [isAuthenticated, user, segments]);
 
+  // ⏳ While auth is loading
   if (isAuthenticated === undefined) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>

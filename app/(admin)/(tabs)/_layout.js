@@ -43,13 +43,22 @@ export default function AdminTabsLayout() {
           ),
         }}
       />
-      {/* The entire adoptions folder is one tab; view.js is hidden by the stack above */}
       <Tabs.Screen
         name="adoptions"
         options={{
           title: "Adoptions",
           tabBarIcon: ({ color }) => (
             <MaterialIcons name="assignment" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="manageVolunteers"
+        options={{
+          title: "Volunteers",
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="people-outline" size={24} color={color} />
           ),
         }}
       />

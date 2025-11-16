@@ -6,6 +6,7 @@ import {
   Image,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -13,6 +14,7 @@ import { db } from "../../../config/firebaseConfig";
 
 export default function CompletedReports() {
   const [completed, setCompleted] = useState([]);
+  const [search, setSearch] = useState("");
   const router = useRouter();
 
   const refs = useMemo(
@@ -37,13 +39,31 @@ export default function CompletedReports() {
     return unsub;
   }, [refs]);
 
+  // FILTER REPORTS BASED ON SEARCH
+  const filtered = completed.filter((item) => {
+    const text = search.toLowerCase();
+
+    return (
+      item.animalType?.toLowerCase().includes(text) ||
+      item.condition?.toLowerCase().includes(text) ||
+      item.address?.toLowerCase().includes(text) ||
+      item.description?.toLowerCase().includes(text) ||
+      item.volunteerName?.toLowerCase().includes(text) ||
+      item.completedAt
+        ?.toDate()
+        .toLocaleString()
+        .toLowerCase()
+        .includes(text)
+    );
+  });
+
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.card}
       onPress={() => router.push(`/ (admin)/completedReports/${item.id}`)}
     >
       <Image
-        source={{ uri: item.imageUrl || "https://via.placeholder.com/80" }}
+        source={{ uri: item.imageUrl || item.photoUrl || "https://via.placeholder.com/80" }}
         style={styles.photo}
       />
 
@@ -66,11 +86,20 @@ export default function CompletedReports() {
     <View style={styles.screen}>
       <Text style={styles.header}>✅ Completed Reports</Text>
 
-      {completed.length === 0 ? (
-        <Text style={styles.empty}>No completed reports yet.</Text>
+      {/* SEARCH BAR */}
+      <TextInput
+        style={styles.search}
+        placeholder="Search by type, condition, address, volunteer..."
+        placeholderTextColor="#9CA3AF"
+        value={search}
+        onChangeText={setSearch}
+      />
+
+      {filtered.length === 0 ? (
+        <Text style={styles.empty}>No matching reports found.</Text>
       ) : (
         <FlatList
-          data={completed}
+          data={filtered}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
           contentContainerStyle={{ paddingBottom: 30 }}
@@ -88,6 +117,18 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     color: "#1E293B",
     marginBottom: 12,
+  },
+
+  search: {
+    backgroundColor: "white",
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
+    marginBottom: 14,
+    fontSize: 16,
+    color: "#1E293B",
   },
 
   empty: { textAlign: "center", marginTop: 20, color: "#6B7280" },

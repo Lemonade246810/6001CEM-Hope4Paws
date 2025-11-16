@@ -3,6 +3,14 @@
     {
       "source": "functions",
       "codebase": "default",
+      "runtime": "nodejs20",
+      "params": {
+        "sendgrid_key": {
+          "label": "SendGrid API Key",
+          "description": "Key used to send Welcome Emails to newly created volunteers",
+          "default": ""
+        }
+      },
       "ignore": [
         "node_modules",
         ".git",

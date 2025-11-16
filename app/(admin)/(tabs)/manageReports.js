@@ -37,7 +37,7 @@ export default function ManageReports() {
     []
   );
 
-  // Load pending reports LIVE (status == Pending)
+  // Load pending reports LIVE
   useEffect(() => {
     const q = query(
       refs.reportsCol,
@@ -53,17 +53,33 @@ export default function ManageReports() {
     return unsub;
   }, [refs]);
 
-  // Load volunteers
+  // Load volunteers ONCE
   useEffect(() => {
     (async () => {
       const q = query(refs.usersCol, where("role", "==", "volunteer"));
       const snap = await getDocs(q);
+
       const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
       setVolunteers(list);
     })();
   }, [refs]);
 
-  // Assign volunteer to report
+  // Build volunteer label
+  const buildVolunteerLabel = (vol) => {
+    const name =
+      vol.username ||
+      vol.fullName ||
+      vol.email ||
+      "Volunteer";
+
+    const badge = vol.isAvailable
+      ? "🟢 Available"
+      : "🔴 Busy / Assigned";
+
+    return `${name} (${badge})`;
+  };
+
+  // Assign volunteer
   const handleAssign = async (report) => {
     const volunteerId = selection[report.id];
 
@@ -77,7 +93,6 @@ export default function ManageReports() {
     try {
       loadingRef.current = true;
 
-      // Get the selected volunteer record
       const volunteer = volunteers.find(
         (v) => (v.userId || v.id) === volunteerId
       );
@@ -87,24 +102,25 @@ export default function ManageReports() {
         return;
       }
 
-      const volunteerName = volunteer.username || volunteer.fullName || volunteer.email || "Volunteer";
+      const volunteerName =
+        volunteer.username ||
+        volunteer.fullName ||
+        volunteer.email ||
+        "Volunteer";
 
-      // Update the report with consistent field names
       await updateDoc(doc(db, "AnimalReports", report.id), {
-        assignedVolunteerId: volunteerId,          // <-- used by VolunteerDashboard
-        assignedVolunteerName: volunteerName,       // <-- displayed in UI
-        assignedTo: volunteerId,                    // <-- optional but good for consistency
+        assignedVolunteerId: volunteerId,
+        assignedVolunteerName: volunteerName,
+        assignedTo: volunteerId,
         assignedAt: serverTimestamp(),
         status: "Assigned",
       });
 
-      // auto toggle availability OFF
       await updateDoc(doc(db, "users", volunteerId), {
         isAvailable: false,
       });
 
       Alert.alert("✅ Assigned", `Assigned to ${volunteerName}`);
-
     } catch (err) {
       console.error("Assign error:", err);
       Alert.alert("Error", "Failed to assign report. Try again.");
@@ -119,6 +135,7 @@ export default function ManageReports() {
     return d.toLocaleString();
   };
 
+  // UI Rendering
   const renderItem = ({ item }) => {
     const selected = selection[item.id] || "";
 
@@ -129,7 +146,9 @@ export default function ManageReports() {
         <Text style={styles.title}>{item.animalType}</Text>
         <Text style={styles.line}>Condition: {item.condition}</Text>
         <Text style={styles.line}>Address: {item.address}</Text>
-        <Text style={styles.timestamp}>Submitted: {formatTime(item.timestamp)}</Text>
+        <Text style={styles.timestamp}>
+          Submitted: {formatTime(item.timestamp)}
+        </Text>
 
         <View style={{ marginTop: 10 }}>
           <Text style={styles.label}>Assign Volunteer:</Text>
@@ -142,11 +161,14 @@ export default function ManageReports() {
               }
             >
               <Picker.Item label="Select a volunteer…" value="" />
+
               {volunteers.map((v) => (
                 <Picker.Item
                   key={v.userId || v.id}
-                  label={v.username || v.email}
+                  label={buildVolunteerLabel(v)}
                   value={v.userId || v.id}
+                  enabled={v.isAvailable === true}
+                  color={v.isAvailable ? "black" : "#9CA3AF"} // disabled grey
                 />
               ))}
             </Picker>
@@ -180,6 +202,7 @@ export default function ManageReports() {
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: "#FFF7ED", padding: 16 },
   header: { fontSize: 22, fontWeight: "800", color: "#1E293B", marginBottom: 12 },
