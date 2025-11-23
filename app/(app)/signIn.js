@@ -29,15 +29,33 @@ export default function SignIn() {
 
   // Forgot Password
   const handleForgotPassword = async () => {
-    if (!emailRef.current) {
-      Alert.alert("Forgot Password", "Please enter your email first.");
+    const email = emailRef.current.trim();
+
+    if (!email) {
+      Alert.alert("Forgot Password", "Please enter your email address.");
       return;
     }
+
     try {
-      await sendPasswordResetEmail(auth, emailRef.current);
-      Alert.alert("Password Reset", "A reset link has been sent to your email.");
+      await sendPasswordResetEmail(auth, email);
+
+      Alert.alert(
+        "Password Reset Email Sent",
+        "A password reset link has been sent to your email.\n\nPlease check your inbox or spam folder."
+      );
     } catch (error) {
-      Alert.alert("Error", "Unable to send reset link. Please try again.");
+      // Firebase error handling
+      let message = "Unable to send reset email.";
+
+      if (error.code === "auth/invalid-email") {
+        message = "The email format is invalid.";
+      } else if (error.code === "auth/user-not-found") {
+        message = "No account found with this email.";
+      } else if (error.code === "auth/missing-email") {
+        message = "Please enter your email before requesting a reset.";
+      }
+
+      Alert.alert("Error", message);
     }
   };
 
@@ -159,7 +177,7 @@ export default function SignIn() {
               >
                 Don't have an account?{" "}
               </Text>
-              <Pressable onPress={() => router.push("/signUp")}>
+              <Pressable onPress={() => router.push("/(app)/signUp")}>
                 <Text
                   style={{ fontSize: hp(1.7) }}
                   className="font-bold text-amber-500"

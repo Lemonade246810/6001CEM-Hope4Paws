@@ -1,4 +1,4 @@
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome5, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 
 export default function AdminTabsLayout() {
@@ -56,9 +56,8 @@ export default function AdminTabsLayout() {
         name="manageVolunteers"
         options={{
           title: "Volunteers",
-          headerShown: false,
-          tabBarIcon: ({ color }) => (
-            <MaterialIcons name="people-outline" size={24} color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome5 name="users" size={24} color={color} />
           ),
         }}
       />
